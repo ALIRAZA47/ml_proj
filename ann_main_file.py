@@ -4,6 +4,8 @@ import random
 # helping funcs
 def DecToBin(n):
     old_n =n
+    if n < 0:
+        n = n*(-1)
     a=[]
     while(n>0):
         dig=n%2
@@ -19,23 +21,23 @@ def DecToBin(n):
     return a
 def BinToDec(binNum):
     # print(binNum)
-    sign_bit = binNum[0]
-    binNum[0] = 0
-    res = int("".join(str(x) for x in binNum), 2)
-    if sign_bit == 1:
-        res = res*(-1)
-    elif sign_bit == 0:
-        res = res * 1    
-    return res 
+    if len(binNum) == 0:
+        return 0
+    else:    
+        sign_bit = binNum[0]
+        binNum[0] = 0
+        res = int("".join(str(x) for x in binNum), 2)
+        if sign_bit == 1:
+            res = res*(-1)
+        elif sign_bit == 0:
+            res = res * 1    
+        return res 
 class ANN:
     def __init__(self):
         pass
     def inp_neuron(self, w1, w2, w3, i1, i2):
         o1 = (w1*i1) + (w2*i2) + (w3*1)
-        if o1 >= 0:
-            return 1
-        elif o1 < 0:
-            return 0    
+        return o1
     def out_neuron(self, w1, w2,w3, i1, i2):
         out = (w1*i1) + (w2*i2) + (w3*1)
         if out >= 0:
@@ -67,8 +69,9 @@ class EvoAlgo(ANN):
                 self.population[i][j] = rndm_num
         # print(self.population)
     def testRandWeights(self):
-        # print(self.population)
-        weights_with_errRate = {}
+        self.success_perc_dict.clear()
+        print(self.population)
+        # weights_with_errRate = {}
         for weights in self.population:
             success_count = 0
             for i in range(len(self.trainInput)):
@@ -87,11 +90,11 @@ class EvoAlgo(ANN):
             sorted_population.append(list(key))
         sorted_population.reverse()
         best_weights = sorted_population[0]
-        # print(unsort_dict[best_weights])
+        print(unsort_dict[best_weights[0],best_weights[1],best_weights[2],best_weights[3],best_weights[4],best_weights[5],best_weights[6],best_weights[7],best_weights[8]])
         return sorted_population    
     def crossover_mutation(self, sortedList):
         self.population.clear()
-        print("\n\n")
+        # print("\n\n")
         # print(sortedList)
         sortedList = list(sortedList)
         iteri = 0
@@ -163,9 +166,11 @@ class EvoAlgo(ANN):
             # Now Joining
             # print(w111Bin)
             # print(w112)
+            # print(w111, w112, w113,w111Bin, w112Bin, w113Bin)
             neu_11.extend(w111Bin)
             neu_11.extend(w112Bin)
             neu_11.extend(w113Bin)
+            # print(neu_11)
             neu_12.extend(w121Bin)
             neu_12.extend(w122Bin)
             neu_12.extend(w123Bin)
@@ -202,7 +207,11 @@ class EvoAlgo(ANN):
                     neu_23.insert(0,0)
             else:
                 for i in range(len(neu_23) - len(neu_13)):
-                    neu_13.insert(0,0)                                
+                    neu_13.insert(0,0)    
+            # print("before crossover--------")
+            # print(neu_11)
+            # print(neu_12)
+            # print (neu_13)                                    
             # now crossover neuron 1
             neu_11.reverse()
             neu_21.reverse()
@@ -214,7 +223,7 @@ class EvoAlgo(ANN):
             # now crossover of neuron 2 
             neu_12.reverse()
             neu_22.reverse()
-            rand_cut = random.randint(0, (len(neu_11) -1))
+            rand_cut = random.randint(0, (len(neu_12) -1))
             for i in range(0, rand_cut):
                 neu_12[i], neu_22[i] = neu_22[i], neu_12[i]
             neu_12.reverse()
@@ -222,35 +231,43 @@ class EvoAlgo(ANN):
             # now crossover of neuron 2 
             neu_13.reverse()
             neu_23.reverse()
-            rand_cut = random.randint(0, (len(neu_11) -1))
+            rand_cut = random.randint(0, (len(neu_23) -1))
             for i in range(0, rand_cut):
                 neu_13[i], neu_23[i] = neu_23[i], neu_13[i] 
             neu_13.reverse()
             neu_23.reverse()           
-            
+            # print("after crossover--------")
+            # print(neu_11)
+            # print(neu_12)
+            # print (neu_13)
             # Now mutation
-            rand_mut = random.randint(0, len(neu_11) - 1)
+            rand_mut = random.randint(0, (len(neu_11) - 1))
             if neu_11[rand_mut] == 1:
                 neu_11[rand_mut] == 0
             else:
                 neu_11[rand_mut]=0
+            rand_mut = random.randint(0, (len(neu_12) - 1))    
             if neu_12[rand_mut] == 1:
                 neu_12[rand_mut] == 0
             else:
                 neu_12[rand_mut]=0
+            rand_mut = random.randint(0, (len(neu_13) - 1))    
             if neu_13[rand_mut] == 1:
                 neu_13[rand_mut] == 0
             else:
                 neu_13[rand_mut]=0
-            ...
+            # ...
+            rand_mut = random.randint(0, (len(neu_11) - 1))
             if neu_21[rand_mut] == 1:
                 neu_21[rand_mut] == 0
             else:
                 neu_21[rand_mut]=0
+            rand_mut = random.randint(0, (len(neu_22) - 1))    
             if neu_22[rand_mut] == 1:
                 neu_22[rand_mut] == 0
             else:
                 neu_22[rand_mut]=0
+            rand_mut = random.randint(0, (len(neu_23) - 1))    
             if neu_23[rand_mut] == 1:
                 neu_23[rand_mut] == 0
             else:
@@ -258,7 +275,7 @@ class EvoAlgo(ANN):
 
             # now converting numbers back to decimal weights
             # print(neu_11)
-            print(neu_22)
+            # print(neu_22)
             w111Bin.clear()
             w112Bin.clear()
             w113Bin.clear()
@@ -341,10 +358,12 @@ class EvoAlgo(ANN):
             w231 = BinToDec(w231Bin)
             w232 = BinToDec(w232Bin)
             w233 = BinToDec(w233Bin)
-            print(w111Bin)
+            # print(w111Bin)
             new_weights = [w111, w112, w113, w121, w122, w123, w131, w132, w133]
             new_weights2 = [w211, w212, w213, w221, w222, w223, w231, w232, w233]
-            print(new_weights2, new_weights)
+            # print('new weights are below')
+            # print(new_weights2, new_weights)
+            # print('new wegh above=--------')
             self.population.append(new_weights)
             self.population.append(new_weights2)
 
@@ -353,7 +372,7 @@ class EvoAlgo(ANN):
         threshooo = 100
         best_fit = 0
         i=0
-        while i <2:
+        while i <100:
             self.testRandWeights()
             a=self.fit_eval(self.success_perc_dict)
             self.crossover_mutation(a)  
